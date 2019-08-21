@@ -31,16 +31,18 @@ def retorna_acoes_doc(url):
     
     return todas_linhas
 
-def insere_documento(documento):
-    #Conectar ao banco, escolhendo já a collection
-    client = MongoClient('localhost', 27017)
-    banco = client.TrabalhoBD
-    acoes = banco.acoes
+def insere_documento(collection,documento):
 
-    acoes.insert_many(documento) #insere a lista no banco
+    collection.insert_many(documento) #insere a lista no banco
 
 
 
 if __name__ == '__main__':
     my_url = 'https://finance.yahoo.com/quote/BUD/history?period1=1550718000&period2=1566356400&interval=1wk&filter=history&frequency=1wk'
-    insere_documento(retorna_acoes_doc(my_url))
+    
+    #Conectar ao banco, escolhendo já a collection
+    client = MongoClient('localhost', 27017)
+    banco = client.TrabalhoBD
+    acoes = banco.acoes
+
+    insere_documento(acoes, retorna_acoes_doc(my_url))
