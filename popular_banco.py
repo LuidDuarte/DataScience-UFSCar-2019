@@ -9,7 +9,7 @@ def retorna_acoes_doc(url):
     page_html = uClient.read() # uCliente baixa tudo da url como um html puro 
     uClient.close()
 
-    page_soup = soup(page_html, "html.parser")
+    page_soup = soup(page_html, 'html.parser')
 
     campos_html = page_soup.findAll("th") #FindAll cria uma lista sendo os elementos as tags procuradas no ()
     nomes_campos = []
