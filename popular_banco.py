@@ -35,41 +35,57 @@ def retorna_acoes_doc(url):
 
 def insere_documento(collection,documento):
 
-    collection.insert_many(documento) #insere a lista no banco
+    collection.insert(documento) #insere a lista no banco
 
 
 if __name__ == '__main__':
     url = ''
+    _url = False
+    tags = []
+    _ticker = False
+    
     if len(sys.argv) >= 2:
         n = 1
         while (n < len(sys.argv)):
             if(sys.argv[n] == '-h'):
-                print('-t <ticker>\n')
+                print('-ticker <ticker> | -url "<url>" (opcional) | -tags <tags> (opcional)\n')
                 quit()
-            if(sys.argv[n] == '-t'):
-                url_base = 'https://finance.yahoo.com/quote/'
+            if(sys.argv[n] == '-ticker'):
                 ticker = sys.argv[n+1].upper()
-                url = url_base + ticker + '/history'
-
+                _ticker = True
+            if(sys.argv[n] == '-url'):
+                url = sys.argv[n+1]
+                _url = True
+            if(sys.argv[n] == "-tags"):
+                while(n < len(sys.argv)-1 and sys.argv[n+1][0] != '-'):
+                    tags.append(sys.argv[n+1])
+                    n += 1 
             n += 1
 
-    if (url):
-        #Conectar ao banco, escolhendo já a collection
-        client = MongoClient('localhost', 27017)
-        banco = client.TrabalhoBD
-        acoes = banco.acoes
+    if(not _ticker):
+        print("Ticker inválido!\n")
+        quit()
 
-        acao = banco.acoes.find_one({"ticker": ticker})
+    if(not _url):
+        url_base = 'https://finance.yahoo.com/quote/'
+        url = url_base + ticker + '/history'
+    
+    
+    #Conectar ao banco, escolhendo já a collection
+    client = MongoClient('localhost', 27017)
+    banco = client.TrabalhoBD
+    acoes = banco.acoes
 
-        if(acao):
-            banco.acoes.update({_id: acao._id}, {$set: {"valores":acao.valores + retorna_acoes_doc(url) }})
-        else:
-            documento = {}
-            documento['ticker'] = ticker
-            documento['valores'] = retorna_acoes_doc(url)
-
-            insere_documento(acoes,documento) 
-
-        client.close()
+    acao = banco.acoes.find_one({"ticker": ticker})
+    
+    if(acao):
+        banco.acoes.update_one({"_id": acao['_id']}, {"$set": {"valores":acao['valores'] + retorna_acoes_doc(url), "tags":acao['tags'] + tags}})
     else:
-        print("Erro na passagem de parametros\n")
+        documento = {}
+        documento['ticker'] = ticker
+        documento['tags'] = tags
+        documento['valores'] = retorna_acoes_doc(url)
+
+        insere_documento(acoes,documento) 
+
+    client.close()
