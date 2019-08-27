@@ -31,14 +31,13 @@ def retorna_buscas_doc(url):
     for noticia_raw in noticias_raw:
         noticia = {}
         noticia['Manchete'] = noticia_raw.find('h3', {'class': 'r'}).a.text
-        noticia['Link'] = noticia_raw.find('h3', {'class': 'r'}).a['href'][7:] # os links começam com /url?q= antes do https:// no href
+        noticia['Link'] = noticia_raw.find('h3', {'class': 'r'}).a['href'][7:].split('&sa')[0] # os links começam com /url?q= antes do https:// no href
         fonte_data = (noticia_raw.find('div', {'class': 'slp'}).span.text).split(' - ')
-        print(fonte_data)
         noticia['Fonte'] = fonte_data[0]
         noticia['Data'] = fonte_data[1]
         noticias.append(noticia)
 
-    print(noticias[:1])
+    print(noticias[4])
 
-url = 'https://www.google.com/search?tbs=cdr:1,cd_min:08/01/2019,cd_max:08/26/2019&tbm=nws&q=batatais'
+url = 'https://www.google.com/search?tbs=cdr:1,cd_min:08/01/2019,cd_max:08/02/2019&tbm=nws&q=ufscar'
 retorna_buscas_doc(url)
