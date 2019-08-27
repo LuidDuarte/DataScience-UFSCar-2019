@@ -44,10 +44,8 @@ if __name__ == '__main__':
         n = 1
         while (n < len(sys.argv)):
             if(sys.argv[n] == '-h'):
-                print('-url <url> ou -t <ticker>\n')
+                print('-t <ticker>\n')
                 quit()
-            if(sys.argv[n] == '-url'):
-                url = sys.argv[n+1]
             if(sys.argv[n] == '-t'):
                 url_base = 'https://finance.yahoo.com/quote/'
                 ticker = sys.argv[n+1].upper()
@@ -61,7 +59,16 @@ if __name__ == '__main__':
         banco = client.TrabalhoBD
         acoes = banco.acoes
 
-        insere_documento(acoes, retorna_acoes_doc(url))
+        acao = banco.acoes.find_one({"ticker": ticker})
+
+        if(acao):
+            banco.acoes.update({_id: acao._id}, {$set: {"valores":acao.valores + retorna_acoes_doc(url) }})
+        else:
+            documento = {}
+            documento['ticker'] = ticker
+            documento['valores'] = retorna_acoes_doc(url)
+
+            insere_documento(acoes,documento) 
 
         client.close()
     else:
