@@ -33,13 +33,21 @@ def retorna_acoes_doc(url):
     
     return todas_linhas
 
-def insere_documento(collection,documento):
+def define_diferencas(documento):
+    print(documento)
+    valor_anterior = float(documento['Values'][0]['Close*'])
+    vetor_diferencas = []
+    for i in range(1, len(documento['Values'])):
+        if (documento['Values'][i].get('Close*')): #Usado get, para não dar erro em linhas que não há o close. 
+            documento['Values'][i]['Variation']  = (float(documento['Values'][i]['Close*']) - valor_anterior )
+            valor_anterior = float(documento['Values'][i]['Close*'])
+    return documento
 
+def insere_documento(collection,documento):
+    documento = define_diferencas(documento)
     collection.insert(documento) #insere a lista no banco
 
-
 if __name__ == '__main__':
-    url = ''
     _url = False
     tags = []
     _ticker = False
@@ -76,15 +84,17 @@ if __name__ == '__main__':
     banco = client.TrabalhoBD
     acoes = banco.acoes
 
-    acao = banco.acoes.find_one({"ticker": ticker})
+    acao = banco.acoes.find_one({"Ticker": ticker})
     
     if(acao):
-        banco.acoes.update_one({"_id": acao['_id']}, {"$set": {"valores":acao['valores'] + retorna_acoes_doc(url), "tags":acao['tags'] + tags}})
+        banco.acoes.update_one( {"_id": acao['_id']},
+                                {"$set": {"Values":acao['Values'] + retorna_acoes_doc(url),
+                                 "Tags":acao['Tags'] + tags}})
     else:
         documento = {}
-        documento['ticker'] = ticker
-        documento['tags'] = tags
-        documento['valores'] = retorna_acoes_doc(url)
+        documento['Ticker'] = ticker
+        documento['Tags'] = tags
+        documento['Values'] = retorna_acoes_doc(url)
 
         insere_documento(acoes,documento) 
 
