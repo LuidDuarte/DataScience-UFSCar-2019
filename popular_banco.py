@@ -34,7 +34,6 @@ def retorna_acoes_doc(url):
     return todas_linhas
 
 def define_diferencas(documento):
-    print(documento)
     valor_anterior = float(documento['Values'][0]['Close*'])
     vetor_diferencas = []
     for i in range(1, len(documento['Values'])):
@@ -43,9 +42,31 @@ def define_diferencas(documento):
             valor_anterior = float(documento['Values'][i]['Close*'])
     return documento
 
+def define_media_variancia(documento):
+    total_diferenca = 0
+    num_diferencas = 0
+    for i in range(1, len(documento['Values'])):
+        if (documento['Values'][i].get('Variation')): #Usado get, para não dar erro em linhas que não há o Variation. 
+            total_diferenca += abs(documento['Values'][i]['Variation'])
+            num_diferencas += 1
+    media_diferenca = total_diferenca/num_diferencas
+    documento['Average'] = media_diferenca
+    
+    somatorio = 0
+    for i in range(1, len(documento['Values'])):
+        if (documento['Values'][i].get('Variation')): #Usado get, para não dar erro em linhas que não há o Variation. 
+            somatorio += ((abs(documento['Values'][i].get('Variation')) - media_diferenca)**2)/num_diferencas
+    
+    variancia = somatorio ** (1/2)
+    documento['Variancy'] = variancia
+
+    return documento
+
 def insere_documento(collection,documento):
     documento = define_diferencas(documento)
+    documento = define_media_variancia(documento)
     collection.insert(documento) #insere a lista no banco
+
 
 if __name__ == '__main__':
     _url = False
