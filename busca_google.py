@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup as soup
-from nltk.corpus import stopwords
 from string import punctuation
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
@@ -37,10 +36,11 @@ def retorna_artigo(url):
     return artigo
 
 def retorna_palavras_chaves(url):
+    from nltk.corpus import stopwords #se não fizer a importação aqui, na segunda vez que a função é executada, da erro por stopwords ser um global (?)
     noticia = retorna_artigo(url)
-    stopwords = set(stopwords.words('portuguese') + list(punctuation))
     sentencas = sent_tokenize(noticia) #divide a noticia em sentenças 
     palavras = word_tokenize(noticia.lower()) #divide a noticia em palavras
+    stopwords = set(stopwords.words('portuguese') + list(punctuation) + list(['``', '\'']))
     palavras_sem_stopwords = [palavra for palavra in palavras if palavra not in stopwords] #da lista de palavras, retira as 'palavras vazias'
     
     return palavras_sem_stopwords
@@ -58,15 +58,19 @@ def retorna_buscas_doc(url):
 
     noticias_raw = page_soup.findAll('div', {'class': 'g'})
     noticias = []
-
+    
     for noticia_raw in noticias_raw:
         noticia = {}
         noticia['Manchete'] = noticia_raw.find('h3', {'class': 'r'}).a.text
         noticia['Link'] = noticia_raw.find('h3', {'class': 'r'}).a['href'][7:].split('&sa')[0] # os links começam com /url?q= antes do https:// no href
         fonte_data = (noticia_raw.find('div', {'class': 'slp'}).span.text).split(' - ')
-        noticia['Trecho'] = noticia_raw.find('div', {'class': 'st'}).text
         noticia['Fonte'] = fonte_data[0]
         noticia['Data'] = fonte_data[1]
+        noticia['Palavras_Chaves'] = retorna_palavras_chaves(noticia['Link'])
+
         noticias.append(noticia)
     
     return noticias
+
+
+print(retorna_buscas_doc('https://www.google.com.br/search?q=teste&client=opera&hs=vNW&sxsrf=ACYBGNTlSSjs4FnQOuvIO6UOjRDYUbY4og:1568787099491&source=lnms&tbm=nws&sa=X&ved=0ahUKEwjuhayu29nkAhXtGbkGHeLmDEIQ_AUIFCgE&biw=1920&bih=938'))
