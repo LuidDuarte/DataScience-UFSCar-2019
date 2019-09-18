@@ -1,5 +1,9 @@
 import requests
 from bs4 import BeautifulSoup as soup
+from nltk.corpus import stopwords
+from string import punctuation
+from nltk.tokenize import word_tokenize
+from nltk.tokenize import sent_tokenize
 
 def gera_url_pesquisa(data_inicio, data_fim, tags):
     qtd_tags = len(tags)-1
@@ -12,6 +16,34 @@ def gera_url_pesquisa(data_inicio, data_fim, tags):
 
     url = 'https://www.google.com/search?tbs=cdr:1,cd_min:{},cd_max:{}&tbm=nws&q={}'.format(data_inicio, data_fim, string_tags)
     return url
+
+def retorna_artigo(url):
+    headers = requests.utils.default_headers() #Se não mudar o header, não tem permissão para acessar (httpError 403)
+    headers.update({
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Mobile Safari/537.36',
+    })
+    uClient = requests.get(url, headers)
+    page_html = uClient.content
+    uClient.close()
+
+    page_soup = soup(page_html, 'html.parser')
+    artigo_raw = page_soup.findAll('p')
+    artigo = ''
+    for paragrafo in artigo_raw:
+        [script.extract() for script in paragrafo('script')] #tirar todas as tags scripts, porque o conteúdo interno é tido como texto também.
+        artigo += paragrafo.text
+
+
+    return artigo
+
+def retorna_palavras_chaves(url):
+    noticia = retorna_artigo(url)
+    stopwords = set(stopwords.words('portuguese') + list(punctuation))
+    sentencas = sent_tokenize(noticia) #divide a noticia em sentenças 
+    palavras = word_tokenize(noticia.lower()) #divide a noticia em palavras
+    palavras_sem_stopwords = [palavra for palavra in palavras if palavra not in stopwords] #da lista de palavras, retira as 'palavras vazias'
+    
+    return palavras_sem_stopwords
 
 def retorna_buscas_doc(url):
     headers = requests.utils.default_headers() #Se não mudar o header, não tem permissão para acessar (httpError 403)
@@ -38,22 +70,3 @@ def retorna_buscas_doc(url):
         noticias.append(noticia)
     
     return noticias
-
-def retorna_artigo(url):
-    headers = requests.utils.default_headers() #Se não mudar o header, não tem permissão para acessar (httpError 403)
-    headers.update({
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Mobile Safari/537.36',
-    })
-    uClient = requests.get(url, headers)
-    page_html = uClient.content
-    uClient.close()
-
-    page_soup = soup(page_html, 'html.parser')
-    artigo_raw = page_soup.findAll('p')
-    texto = ''
-    for paragrafo in artigo_raw:
-        [script.extract() for script in paragrafo('script')]
-        texto += paragrafo.text
-
-
-    return texto
