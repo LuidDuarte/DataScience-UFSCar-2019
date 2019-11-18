@@ -71,6 +71,3 @@ def retorna_buscas_doc(url):
         noticias.append(noticia)
     
     return noticias
-
-
-print(retorna_buscas_doc('https://www.google.com.br/search?q=teste&client=opera&hs=vNW&sxsrf=ACYBGNTlSSjs4FnQOuvIO6UOjRDYUbY4og:1568787099491&source=lnms&tbm=nws&sa=X&ved=0ahUKEwjuhayu29nkAhXtGbkGHeLmDEIQ_AUIFCgE&biw=1920&bih=938'))
