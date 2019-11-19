@@ -24,7 +24,7 @@ def retorna_acoes_doc(url):
         linha_especifica = {}
         if len(tags_campos) > 2: #Os dividendos são mostrados na mesma tabela, porém dentro do tr existem só 2 tds
             for tag in tags_campos: #Em cada td há um span com o valor que queremos
-                linha_especifica[nomes_campos[tags_campos.index(tag)]] = tag.span.text
+                linha_especifica[nomes_campos[tags_campos.index(tag)]] = tag.text
         else:
             linha_especifica['Date'] = tags_campos[0].span.text
             linha_especifica[tags_campos[1].span.text] = tags_campos[1].strong.text
