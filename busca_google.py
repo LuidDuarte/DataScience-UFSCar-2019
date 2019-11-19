@@ -40,17 +40,18 @@ def retorna_artigo(url):
 
     return artigo
 
-def retorna_palavras_chaves(url):
+def retorna_palavras_chaves(url, tags):
     from nltk.corpus import stopwords #se não fizer a importação aqui, na segunda vez que a função é executada, da erro por stopwords ser um global (?)
     noticia = retorna_artigo(url)
     sentencas = sent_tokenize(noticia) #divide a noticia em sentenças 
     palavras = word_tokenize(noticia.lower()) #divide a noticia em palavras
-    stopwords = set(stopwords.words('portuguese') + list(punctuation) + list(['``', '\'']))
+    tags = [tag.lower() for tag in tags]
+    stopwords = set(stopwords.words('portuguese') + list(punctuation) + list(['``', '\'']) + tags)
     palavras_sem_stopwords = [palavra for palavra in palavras if palavra not in stopwords] #da lista de palavras, retira as 'palavras vazias'
     
     return palavras_sem_stopwords
 
-def retorna_vetor_noticias(url):
+def retorna_vetor_noticias(url, tags):
     headers = requests.utils.default_headers() #Se não mudar o header, não tem permissão para acessar (httpError 403)
     headers.update({
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36 OPR/63.0.3368.43',
@@ -67,7 +68,7 @@ def retorna_vetor_noticias(url):
         noticia = {}
         noticia['Manchete'] = noticia_raw.find('div', {'class': 'BNeawe vvjwJb AP7Wnd'}).text
         noticia['Link'] = noticia_raw.find('div', {'class': 'kCrYT'}).a['href'][7:].split('&sa')[0] # os links começam com /url?q= antes do https:// no href
-        noticia['Palavras_Chaves'] = retorna_palavras_chaves(noticia['Link'])
+        noticia['Palavras_Chaves'] = retorna_palavras_chaves(noticia['Link'], tags)
 
         noticias.append(noticia)
     
@@ -75,4 +76,4 @@ def retorna_vetor_noticias(url):
 
 def retorna_doc_noticias(data_inicio, tags):
     return retorna_vetor_noticias(
-        gera_url_pesquisa(data_inicio, tags))
+        gera_url_pesquisa(data_inicio, tags), tags)
