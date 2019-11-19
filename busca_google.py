@@ -4,10 +4,42 @@ from string import punctuation
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 
+
+def padroniza_data(data):
+    mes_dia, ano = data.split(', ')
+    mes, dia = mes_dia.split(' ')
+    if mes == 'Jan':
+        mes = '01'
+    elif mes == 'Feb':
+        mes = '02'
+    elif mes == 'Mar':
+        mes = '03'
+    elif mes == 'Apr':
+        mes = '04'
+    elif mes == 'May':
+        mes = '05'
+    elif mes == 'Jun':
+        mes = '06'
+    elif mes == 'Jul':
+        mes = '07'
+    elif mes == 'Aug':
+        mes = '08'
+    elif mes == 'Sep':
+        mes = '09'
+    elif mes == 'Oct':
+        mes = '10'
+    elif mes == 'Nov':
+        mes = '11'
+    elif mes == 'Dec':
+        mes = '12'
+
+    return dia + '/' + mes + '/' + ano
+
 def gera_url_pesquisa(data_inicio, data_fim, tags):
     qtd_tags = len(tags)-1
     string_tags = ''
-
+    data_inicio = padroniza_data(data_inicio)
+    data_fim = padroniza_data(data_fim)
     while(qtd_tags > 0):
         string_tags += tags[qtd_tags] + '+'
         qtd_tags -= 1
