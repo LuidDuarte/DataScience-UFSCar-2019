@@ -73,4 +73,4 @@ def retorna_vetor_noticias(url):
 
 def retorna_doc_noticias(data_inicio, tags):
     return retorna_vetor_noticias(
-        gera_url_pesquisa(data_inicio, data_fim, tags))
+        gera_url_pesquisa(data_inicio, tags))
