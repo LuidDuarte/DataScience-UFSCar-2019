@@ -12,8 +12,8 @@ nltk.download('stopwords')
 def gera_url_pesquisa(data, tags):
     qtd_tags = len(tags)-1
     string_tags = ''
-    data_inicio = datetime.strptime(data, '%b %d, %Y').strftime('%d/%m/%Y')
-    data_fim = (datetime.strptime(data, '%b %d, %Y') + timedelta(days=1)).strftime('%d/%m/%Y')
+    data_fim = datetime.strptime(data, '%b %d, %Y').strftime('%d/%m/%Y')
+    data_inicio = (datetime.strptime(data, '%b %d, %Y') - 1 timedelta(days=1)).strftime('%d/%m/%Y')
     while(qtd_tags > 0):
         string_tags += tags[qtd_tags] + '+'
         qtd_tags -= 1
@@ -64,7 +64,7 @@ def retorna_vetor_noticias(url, tags):
    
     noticias_raw = page_soup.findAll('div', {'class': 'ZINbbc xpd O9g5cc uUPGi'})
     noticias = []
-    for noticia_raw in noticias_raw[0:3]:
+    for noticia_raw in noticias_raw:
         noticia = {}
         noticia['Manchete'] = noticia_raw.find('div', {'class': 'BNeawe vvjwJb AP7Wnd'}).text
         noticia['Link'] = noticia_raw.find('div', {'class': 'kCrYT'}).a['href'][7:].split('&sa')[0] # os links começam com /url?q= antes do https:// no href
