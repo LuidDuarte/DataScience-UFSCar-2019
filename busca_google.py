@@ -45,7 +45,7 @@ def retorna_palavras_chaves(url):
     
     return palavras_sem_stopwords
 
-def retorna_buscas_doc(url):
+def retorna_vetor_noticias(url):
     headers = requests.utils.default_headers() #Se não mudar o header, não tem permissão para acessar (httpError 403)
     headers.update({
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36 OPR/63.0.3368.43',
@@ -71,3 +71,7 @@ def retorna_buscas_doc(url):
         noticias.append(noticia)
     
     return noticias
+
+def retorna_doc(data_inicio, data_fim, tags):
+    return retorna_vetor_noticias(
+        gera_url_pesquisa(data_inicio, data_fim, tags))
