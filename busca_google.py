@@ -62,12 +62,12 @@ def retorna_vetor_noticias(url, tags):
 
     page_soup = soup(page_html, 'html.parser')
    
-    noticias_raw = page_soup.findAll('div', {'class': 'ZINbbc xpd O9g5cc uUPGi'})
+    noticias_raw = page_soup.findAll('div', {'class': 'g'})
     noticias = []
     for noticia_raw in noticias_raw:
         noticia = {}
-        noticia['Manchete'] = noticia_raw.find('div', {'class': 'BNeawe vvjwJb AP7Wnd'}).text
-        noticia['Link'] = noticia_raw.find('div', {'class': 'kCrYT'}).a['href'][7:].split('&sa')[0] # os links começam com /url?q= antes do https:// no href
+        noticia['Manchete'] = noticia_raw.find('h3', {'class': 'r'}).text
+        noticia['Link'] = noticia_raw.find('h3', {'class': 'r'}).a['href'][7:].split('&sa')[0] # os links começam com /url?q= antes do https:// no href
         noticia['Palavras_Chaves'] = retorna_palavras_chaves(noticia['Link'], tags)
 
         noticias.append(noticia)
